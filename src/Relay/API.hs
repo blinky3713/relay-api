@@ -13,7 +13,7 @@ module Relay.API
 
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Relay.Types (ECSignature, ExchangeOrder, OrderBook)
+import Relay.Types (ExchangeOrder, OrderBook)
 import Servant.API
 import Servant.Client
 

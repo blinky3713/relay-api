@@ -2,9 +2,18 @@ resolver: lts-10.0
 
 packages:
  - '.'
+
  - location:
      git: https://github.com/f-o-a-m/hs-web3
      commit: 17d204a9668eac66936a695459088bdaafd28f18
+   extra-dep: true
+
+ - location:
+     git: https://github.com/f-o-a-m/selda
+     commit: 64993ae4f4249df1222691fcb6341367fb8c68d4
+     subdirs:
+       - selda 
+       - selda-postgresql
    extra-dep: true
 
 # - some-directory
