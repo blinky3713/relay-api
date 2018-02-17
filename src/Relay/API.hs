@@ -2,19 +2,22 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Lib
-    ( someFunc
+module Relay.API
+    ( GetExchangeOrders
+    , getExchangeOrders
+    , GetOrderByHash
+    , getOrderByHash
+    , GetOrderBook
+    , getOrderBook
     ) where
 
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Types (ECSignature, ExchangeOrder)
+import Relay.Types (ECSignature, ExchangeOrder, OrderBook)
 import Servant.API
 import Servant.Client
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-
+type Paginated route = QueryParam "per_page" Int :> QueryParam "page" Int :> route
 
 type GetExchangeOrders =
      "orders"
@@ -29,7 +32,9 @@ type GetExchangeOrders =
   :> Get '[JSON] [ExchangeOrder]
 
 getExchangeOrders ::
-     [T.Text]
+     Maybe Int
+  -> Maybe Int
+  -> [T.Text]
   -> [T.Text]
   -> [T.Text]
   -> [T.Text]
@@ -38,9 +43,9 @@ getExchangeOrders ::
   -> [T.Text]
   -> [T.Text]
   -> ClientM [ExchangeOrder]
-getExchangeOrders = client $ Proxy @GetExchangeOrders
+getExchangeOrders = client $ Proxy @(Paginated GetExchangeOrders)
 
-type GetOrder =
+type GetOrderByHash =
     "order"
   :> Capture "hash" T.Text
   :> Get '[JSON] ExchangeOrder
@@ -48,5 +53,18 @@ type GetOrder =
 getOrderByHash
   :: T.Text
   -> ClientM ExchangeOrder
-getOrderByHash = client $ Proxy @GetOrder
+getOrderByHash = client $ Proxy @GetOrderByHash
 
+type GetOrderBook =
+      "orderbook"
+   :> QueryParams "baseTokenAddress" T.Text
+   :> QueryParams "quoteTokenAddress" T.Text
+   :> Get '[JSON] [OrderBook]
+
+getOrderBook
+  :: Maybe Int
+  -> Maybe Int
+  -> [T.Text]
+  -> [T.Text]
+  -> ClientM [OrderBook]
+getOrderBook = client $ Proxy @(Paginated GetOrderBook)

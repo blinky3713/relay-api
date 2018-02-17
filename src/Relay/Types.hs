@@ -1,8 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Types
+module Relay.Types
   ( ECSignature(..)
   , ExchangeOrder(..)
+  , OrderBook(..)
   , relayOptions
   ) where
 
