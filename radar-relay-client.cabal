@@ -39,6 +39,7 @@ library
     , text
     , web3
     , websockets
+    , wuss
   exposed-modules:
       Relay
       Relay.API

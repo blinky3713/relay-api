@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Relay.API
@@ -11,16 +12,18 @@ module Relay.API
     , getOrderBook
     , GetTokenPairs
     , getTokenPairs
+    , mkClientApp
     ) where
 
 import Control.Monad (forever)
 import qualified Data.Aeson as A
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Network.WebSockets (runClient, receiveData, sendBinaryData)
-import Relay.Types (ExchangeOrder, OrderBook, TokenPair, WebsocketReq)
+import Network.WebSockets (runClient, receiveData, sendBinaryData, forkPingThread)
+import Relay.Types (ExchangeOrder, OrderBook, TokenPair, WebsocketReqPayload, WebsocketReq(..), WebsocketResponse(..))
 import Servant.API
 import Servant.Client
+import Wuss (runSecureClient)
 
 type Paginated route = QueryParam "per_page" Int :> QueryParam "page" Int :> route
 
@@ -87,26 +90,34 @@ getTokenPairs = client $ Proxy @GetTokenPairs
 -- Websocket
 
 mkClientApp
-  :: WebsocketReq
+  :: WebsocketReqPayload
   -> (OrderBook -> IO Bool)
   -> IO ()
 mkClientApp req handler = do
     let host = "ws.radarrelay.com"
         path = "/0x/v0/ws"
-        port = 80
-    runClient host port path $ \connection -> do
-      _ <- sendBinaryData connection $ A.encode req
+        port = 443
+        wsReq = WebsocketReq { websocketreqChannel = "orderbook"
+                             , websocketreqRequestId = 1
+                             , websocketreqType = "subscribe"
+                             , websocketreqPayload = req
+                             }
+    runSecureClient host port path $ \connection -> do
+      let req = A.encode wsReq
+      print req
+      _ <- sendBinaryData connection req
+      forkPingThread connection 10
       loop connection
   where
     loop conn = forever $ do
       raw <- receiveData conn
-      case A.decode raw of
+      print $ raw
+      case websocketresponsePayload <$> A.decode raw of
         Nothing -> do
           print $  "Couldn't decode as OrderBook : " ++ show raw
-          return ()
+          loop conn
         Just ob -> do
           continue <- handler ob
           if continue
             then loop conn
             else return ()
-

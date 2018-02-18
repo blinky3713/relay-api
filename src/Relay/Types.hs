@@ -7,6 +7,8 @@ module Relay.Types
   , Token(..)
   , TokenPair(..)
   , WebsocketReq(..)
+  , WebsocketReqPayload(..)
+  , WebsocketResponse(..)
   ) where
 
 
@@ -74,12 +76,26 @@ instance A.ToJSON TokenPair where
   toJSON = A.genericToJSON relayOptions
 
 
+data WebsocketReqPayload =
+  WebsocketReqPayload { websocketreqpayloadBaseTokenAddress :: T.Text
+                      , websocketreqpayloadQuoteTokenAddress :: T.Text
+                      , websocketreqpayloadSnapshot :: Bool
+                      , websocketreqpayloadSnapshotLimit :: Integer
+                      }
+  deriving (Eq, Show, Generic)
+
+instance A.FromJSON WebsocketReqPayload where
+  parseJSON = A.genericParseJSON relayOptions
+
+instance A.ToJSON WebsocketReqPayload where
+  toJSON = A.genericToJSON relayOptions
+
+
 data WebsocketReq =
   WebsocketReq { websocketreqRequestId :: Integer
-               , websocketreqBaseTokenAddress :: T.Text
-               , websocketreqQuoteTokenAddress :: T.Text
-               , websocketreqSnapshot :: Bool
-               , websocketreqSnapshotLimit :: Integer
+               , websocketreqType :: T.Text
+               , websocketreqChannel :: T.Text
+               , websocketreqPayload :: WebsocketReqPayload
                }
   deriving (Eq, Show, Generic)
 
@@ -87,6 +103,17 @@ instance A.FromJSON WebsocketReq where
   parseJSON = A.genericParseJSON relayOptions
 
 instance A.ToJSON WebsocketReq where
+  toJSON = A.genericToJSON relayOptions
+
+data WebsocketResponse =
+  WebsocketResponce { websocketresponsePayload :: OrderBook
+                    }
+  deriving (Eq, Show, Generic)
+
+instance A.FromJSON WebsocketResponse where
+  parseJSON = A.genericParseJSON relayOptions
+
+instance A.ToJSON WebsocketResponse where
   toJSON = A.genericToJSON relayOptions
 
 
