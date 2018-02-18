@@ -1,0 +1,63 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: d7352e8226f53cb03f68273311983ad49de73a7ebe6d4fccd06255ab9ef688f2
+
+name:           radar-relay-client
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/githubuser/radar-relay-client#readme>
+homepage:       https://github.com/githubuser/radar-relay-client#readme
+bug-reports:    https://github.com/githubuser/radar-relay-client/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2018 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/radar-relay-client
+
+library
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , aeson
+    , aeson-casing
+    , http-client
+    , selda
+    , servant
+    , servant-client
+    , text
+    , web3
+  exposed-modules:
+      Relay
+      Relay.API
+      Relay.Types
+      Relay.DB
+  other-modules:
+      Paths_radar_relay_client
+  default-language: Haskell2010
+
+test-suite radar-relay-client-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , hspec
+    , radar-relay-client
+  other-modules:
+      Paths_radar_relay_client
+      Relay.APISpec
+  default-language: Haskell2010
