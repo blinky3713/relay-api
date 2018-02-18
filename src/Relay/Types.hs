@@ -24,8 +24,11 @@ data ExchangeOrder =
                 , exchangeorderTaker :: T.Text
                 , exchangeorderMakerTokenAddress :: T.Text
                 , exchangeorderTakerTokenAddress :: T.Text
+                , exchangeorderMakerTokenAmount :: T.Text
+                , exchangeorderTakerTokenAmount :: T.Text
                 , exchangeorderMakerFee :: T.Text
                 , exchangeorderTakerFee :: T.Text
+                , exchangeorderFeeRecipient :: T.Text
                 , exchangeorderExpirationUnixTimestampSec :: T.Text
                 }
   deriving (Eq, Show, Generic)
