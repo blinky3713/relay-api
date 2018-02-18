@@ -1,6 +1,7 @@
 module Relay
   ( module Relay.Types
   , module Relay.API
+  , module Servant.Client
   , mkRelayClientEnv
   ) where
 

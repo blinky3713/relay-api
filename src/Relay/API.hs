@@ -9,11 +9,13 @@ module Relay.API
     , getOrderByHash
     , GetOrderBook
     , getOrderBook
+    , GetTokenPairs
+    , getTokenPairs
     ) where
 
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Relay.Types (ExchangeOrder, OrderBook)
+import Relay.Types (ExchangeOrder, OrderBook, TokenPair)
 import Servant.API
 import Servant.Client
 
@@ -59,12 +61,22 @@ type GetOrderBook =
       "orderbook"
    :> QueryParams "baseTokenAddress" T.Text
    :> QueryParams "quoteTokenAddress" T.Text
-   :> Get '[JSON] [OrderBook]
+   :> Get '[JSON] OrderBook
 
 getOrderBook
   :: Maybe Int
   -> Maybe Int
   -> [T.Text]
   -> [T.Text]
-  -> ClientM [OrderBook]
+  -> ClientM OrderBook
 getOrderBook = client $ Proxy @(Paginated GetOrderBook)
+
+type GetTokenPairs =
+     "token_pairs"
+  :> QueryParams "tokenA=&tokenB" T.Text
+  :> Get '[JSON] [TokenPair]
+
+getTokenPairs
+  :: [T.Text]
+  -> ClientM [TokenPair]
+getTokenPairs = client $ Proxy @GetTokenPairs
