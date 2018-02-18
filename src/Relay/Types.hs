@@ -9,6 +9,7 @@ module Relay.Types
   , WebsocketReq(..)
   , WebsocketReqPayload(..)
   , WebsocketResponse(..)
+  , ERCDexNewOrderEvent(..)
   ) where
 
 
@@ -119,8 +120,20 @@ instance A.FromJSON WebsocketResponse where
 instance A.ToJSON WebsocketResponse where
   toJSON = A.genericToJSON relayOptions
 
+data ERCDexNewOrderEvent =
+  ERCDexNewOrderEvent { ercnewordereventOrder :: ExchangeOrder
+                      }
+  deriving (Eq, Show, Generic)
+
+instance A.FromJSON ERCDexNewOrderEvent where
+  parseJSON = A.genericParseJSON relayOptions
+
+instance A.ToJSON ERCDexNewOrderEvent where
+  toJSON = A.genericToJSON relayOptions
+
 
 -- JSON Options
 
 relayOptions :: A.Options
 relayOptions = aesonPrefix camelCase
+

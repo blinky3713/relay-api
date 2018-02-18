@@ -12,15 +12,17 @@ module Relay.API
     , getOrderBook
     , GetTokenPairs
     , getTokenPairs
-    , mkClientApp
+    , mkRadarClientApp
+    , mkERCDexClientApp
     ) where
 
 import Control.Monad (forever)
 import qualified Data.Aeson as A
+import Data.Monoid
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Network.WebSockets (runClient, receiveData, sendBinaryData, forkPingThread)
-import Relay.Types (ExchangeOrder, OrderBook, TokenPair, WebsocketReqPayload, WebsocketReq(..), WebsocketResponse(..))
+import Network.WebSockets (runClient, receiveData, sendBinaryData, sendTextData, forkPingThread)
+import Relay.Types (ExchangeOrder, OrderBook, TokenPair, WebsocketReqPayload(..), WebsocketReq(..), WebsocketResponse(..), ERCDexNewOrderEvent(..))
 import Servant.API
 import Servant.Client
 import Wuss (runSecureClient)
@@ -89,11 +91,12 @@ getTokenPairs = client $ Proxy @GetTokenPairs
 
 -- Websocket
 
-mkClientApp
+-- | Radar Relay
+mkRadarClientApp
   :: WebsocketReqPayload
   -> (OrderBook -> IO Bool)
   -> IO ()
-mkClientApp req handler = do
+mkRadarClientApp req handler = do
     let host = "ws.radarrelay.com"
         path = "/0x/v0/ws"
         port = 443
@@ -118,6 +121,36 @@ mkClientApp req handler = do
           loop conn
         Just ob -> do
           continue <- handler ob
+          if continue
+            then loop conn
+            else return ()
+
+
+-- | Radar Relay
+mkERCDexClientApp
+  :: WebsocketReqPayload
+  -> (ExchangeOrder -> IO Bool)
+  -> IO ()
+mkERCDexClientApp req handler = do
+    let host = "api.ercdex.com"
+        path = "/"
+        port = 443
+    runSecureClient host port path $ \connection -> do
+      let msg = "sub:pair-order-change/" <> (websocketreqpayloadBaseTokenAddress req) <> "/" <> (websocketreqpayloadQuoteTokenAddress req)
+      _ <- sendTextData connection msg
+      forkPingThread connection 10
+      print msg
+      loop connection
+  where
+    loop conn = forever $ do
+      raw <- receiveData conn
+      print $ raw
+      case ercnewordereventOrder <$> A.decode raw of
+        Nothing -> do
+          print $  "Couldn't decode as Order : " ++ show raw
+          loop conn
+        Just o -> do
+          continue <- handler o
           if continue
             then loop conn
             else return ()

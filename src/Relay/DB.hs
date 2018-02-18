@@ -5,8 +5,8 @@ module Relay.DB where
 import Relay.Types
 import qualified Database.Selda.Generic    as SG
 
-orders :: SG.GenTable ExchangeOrder
-orders = SG.genTable "order" []
+orders :: String -> SG.GenTable ExchangeOrder
+orders s = SG.genTable (s <> _"order") []
 
 tokens :: SG.GenTable Token
 tokens = SG.genTable "token" []
