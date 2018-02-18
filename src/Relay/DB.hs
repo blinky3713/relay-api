@@ -7,3 +7,6 @@ import qualified Database.Selda.Generic    as SG
 
 orders :: SG.GenTable ExchangeOrder
 orders = SG.genTable "order" []
+
+tokens :: SG.GenTable Token
+tokens = SG.genTable "token" []
