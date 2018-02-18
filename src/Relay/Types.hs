@@ -6,7 +6,7 @@ module Relay.Types
   , OrderBook(..)
   , Token(..)
   , TokenPair(..)
-  , relayOptions
+  , WebsocketReq(..)
   ) where
 
 
@@ -73,6 +73,21 @@ instance A.FromJSON TokenPair where
 instance A.ToJSON TokenPair where
   toJSON = A.genericToJSON relayOptions
 
+
+data WebsocketReq =
+  WebsocketReq { websocketreqRequestId :: Integer
+               , websocketreqBaseTokenAddress :: T.Text
+               , websocketreqQuoteTokenAddress :: T.Text
+               , websocketreqSnapshot :: Bool
+               , websocketreqSnapshotLimit :: Integer
+               }
+  deriving (Eq, Show, Generic)
+
+instance A.FromJSON WebsocketReq where
+  parseJSON = A.genericParseJSON relayOptions
+
+instance A.ToJSON WebsocketReq where
+  toJSON = A.genericToJSON relayOptions
 
 
 -- JSON Options

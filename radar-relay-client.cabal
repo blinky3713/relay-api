@@ -38,6 +38,7 @@ library
     , servant-client
     , text
     , web3
+    , websockets
   exposed-modules:
       Relay
       Relay.API

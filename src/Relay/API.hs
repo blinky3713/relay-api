@@ -13,9 +13,12 @@ module Relay.API
     , getTokenPairs
     ) where
 
+import Control.Monad (forever)
+import qualified Data.Aeson as A
 import Data.Proxy (Proxy(..))
 import qualified Data.Text as T
-import Relay.Types (ExchangeOrder, OrderBook, TokenPair)
+import Network.WebSockets (runClient, receiveData, sendBinaryData)
+import Relay.Types (ExchangeOrder, OrderBook, TokenPair, WebsocketReq)
 import Servant.API
 import Servant.Client
 
@@ -80,3 +83,30 @@ getTokenPairs
   :: [T.Text]
   -> ClientM [TokenPair]
 getTokenPairs = client $ Proxy @GetTokenPairs
+
+-- Websocket
+
+mkClientApp
+  :: WebsocketReq
+  -> (OrderBook -> IO Bool)
+  -> IO ()
+mkClientApp req handler = do
+    let host = "ws.radarrelay.com"
+        path = "/0x/v0/ws"
+        port = 80
+    runClient host port path $ \connection -> do
+      _ <- sendBinaryData connection $ A.encode req
+      loop connection
+  where
+    loop conn = forever $ do
+      raw <- receiveData conn
+      case A.decode raw of
+        Nothing -> do
+          print $  "Couldn't decode as OrderBook : " ++ show raw
+          return ()
+        Just ob -> do
+          continue <- handler ob
+          if continue
+            then loop conn
+            else return ()
+
