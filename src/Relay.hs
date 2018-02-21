@@ -15,6 +15,6 @@ mkRelayClientEnv
   -> String
   -> Int
   -> IO ClientEnv
-mkRelayClientEnv host path port = do
+mkRelayClientEnv hst pth prt = do
   mgr <- newManager defaultManagerSettings
-  return $ ClientEnv mgr (BaseUrl Http host port path)
+  return $ ClientEnv mgr (BaseUrl Http hst prt pth)
