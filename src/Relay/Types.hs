@@ -345,7 +345,7 @@ instance Example OrderBook where
 
 instance ToSchema OrderBook where
   declareNamedSchema _ = do
-    s <- genericDeclareNamedSchema relaySchemaOptions (Proxy @ExchangeOrder)
+    s <- genericDeclareNamedSchema relaySchemaOptions (Proxy @OrderBook)
     return $ s & schema . example ?~ (A.toJSON . eg $ Proxy @OrderBook)
 
 data Token =
