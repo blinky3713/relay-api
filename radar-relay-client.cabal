@@ -48,6 +48,7 @@ library
     , secp256k1
     , servant
     , servant-client
+    , servant-swagger
     , swagger2
     , text
     , time

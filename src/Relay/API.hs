@@ -18,6 +18,10 @@ import Data.Proxy (Proxy(..))
 import Relay.Types
 import Servant.API
 import Servant.Client
+import Control.Lens ((&), (.~))
+import Data.Swagger (Swagger, info, title, version)
+import           Servant.Swagger
+
 
 type Paginated route = QueryParam "per_page" Int :> QueryParam "page" Int :> route
 
@@ -80,3 +84,20 @@ getTokenPairs
   :: [Address]
   -> ClientM [TokenPair]
 getTokenPairs = client $ Proxy @GetTokenPairs
+
+type RelayAPI =
+       GetExchangeOrders
+  :<|> GetExchangeOrders
+  :<|> GetOrderByHash
+  :<|> GetOrderBook
+  :<|> GetTokenPairs
+
+relayAPI :: Proxy RelayAPI
+relayAPI = Proxy
+
+type SwaggerApi = "swagger.json" :> Get '[JSON] Swagger
+
+relaySwagger :: Swagger
+relaySwagger = toSwagger relayAPI
+  & info.title   .~ "Relay API"
+  & info.version .~ "v0"
