@@ -41,11 +41,14 @@ library
     , bytestring
     , base16-bytestring
     , errors
+    , http-api-data
     , http-client
+    , lens
     , parsec
     , secp256k1
     , servant
     , servant-client
+    , swagger2
     , text
     , time
     , web3

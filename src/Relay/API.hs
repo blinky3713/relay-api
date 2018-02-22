@@ -15,8 +15,7 @@ module Relay.API
     ) where
 
 import Data.Proxy (Proxy(..))
-import qualified Data.Text as T
-import Relay.Types (ExchangeOrder, OrderBook, TokenPair)
+import Relay.Types
 import Servant.API
 import Servant.Client
 
@@ -24,60 +23,60 @@ type Paginated route = QueryParam "per_page" Int :> QueryParam "page" Int :> rou
 
 type GetExchangeOrders =
      "orders"
-  :> QueryParams "exchangeContractAddress" T.Text
-  :> QueryParams "tokenAddress" T.Text
-  :> QueryParams "makerTokenAddress" T.Text
-  :> QueryParams "takerTokenAddress" T.Text
-  :> QueryParams "maker" T.Text
-  :> QueryParams "taker" T.Text
-  :> QueryParams "trader" T.Text
-  :> QueryParams "feeRecipient" T.Text
+  :> QueryParams "exchangeContractAddress" Address
+  :> QueryParams "tokenAddress" Address
+  :> QueryParams "makerTokenAddress" Address
+  :> QueryParams "takerTokenAddress" Address
+  :> QueryParams "maker" Address
+  :> QueryParams "taker" Address
+  :> QueryParams "trader" Address
+  :> QueryParams "feeRecipient" Address
   :> Get '[JSON] [ExchangeOrder]
 
 getExchangeOrders ::
      Maybe Int
   -> Maybe Int
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
-  -> [T.Text]
+  -> [Address]
+  -> [Address]
+  -> [Address]
+  -> [Address]
+  -> [Address]
+  -> [Address]
+  -> [Address]
+  -> [Address]
   -> ClientM [ExchangeOrder]
 getExchangeOrders = client $ Proxy @(Paginated GetExchangeOrders)
 
 type GetOrderByHash =
     "order"
-  :> Capture "hash" T.Text
+  :> Capture "hash" HexString
   :> Get '[JSON] ExchangeOrder
 
 getOrderByHash
-  :: T.Text
+  :: HexString
   -> ClientM ExchangeOrder
 getOrderByHash = client $ Proxy @GetOrderByHash
 
 type GetOrderBook =
       "orderbook"
-   :> QueryParams "baseTokenAddress" T.Text
-   :> QueryParams "quoteTokenAddress" T.Text
+   :> QueryParams "baseTokenAddress" Address
+   :> QueryParams "quoteTokenAddress" Address
    :> Get '[JSON] OrderBook
 
 getOrderBook
   :: Maybe Int
   -> Maybe Int
-  -> [T.Text]
-  -> [T.Text]
+  -> [Address]
+  -> [Address]
   -> ClientM OrderBook
 getOrderBook = client $ Proxy @(Paginated GetOrderBook)
 
 type GetTokenPairs =
      "token_pairs"
-  :> QueryParams "tokenA=&tokenB" T.Text
+  :> QueryParams "tokenA=&tokenB" Address
   :> Get '[JSON] [TokenPair]
 
 getTokenPairs
-  :: [T.Text]
+  :: [Address]
   -> ClientM [TokenPair]
 getTokenPairs = client $ Proxy @GetTokenPairs
