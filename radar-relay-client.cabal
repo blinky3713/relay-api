@@ -54,10 +54,11 @@ library
     , time
     , web3
   exposed-modules:
-      Relay
-      Relay.API
+      Relay.API.API
+      Relay.API.Client
       Relay.Types
   other-modules:
+      Relay.Utils
       Paths_radar_relay_client
   default-language: Haskell2010
 
